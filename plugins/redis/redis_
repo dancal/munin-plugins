@@ -37,8 +37,17 @@ use strict;
 use IO::Socket::INET;
 use Switch;
 
-my $HOST = exists $ENV{'host'} ? $ENV{'host'} : "127.0.0.1";
-my $PORT = exists $ENV{'port'} ? $ENV{'port'} : 6379;
+#my $HOST = exists $ENV{'host'} ? $ENV{'host'} : "127.0.0.1";
+#my $PORT = exists $ENV{'port'} ? $ENV{'port'} : 6379;
+
+$0 =~ /redis_(.+)_(\d+_\d+_\d+_\d+)_(\d+)$/;
+my ($cmd, $ip, $port) = ($1, $2, $3);
+$ip =~ s/_/./g;
+my $address = "$ip:$port";
+
+my $HOST = $ip;
+my $PORT = $port;
+
 my $PASSWORD = exists $ENV{'password'} ? $ENV{'password'} : undef;
 
 my $sock = &get_conn();
@@ -80,9 +89,9 @@ foreach (split(/\r\n/, $rep)) {
 }
 close ($sock);
 
-$0 =~ s/(.+)redis_//g;
+#$0 =~ s/(.+)redis_//g;
 
-switch ($0) {
+switch ($cmd) {
     case "connected_clients" {
         if ( $config ) {
             print "graph_title Connected clients\n";
@@ -134,7 +143,7 @@ switch ($0) {
             print "missratio.draw STACK\n";
             exit 0;
         }
-            
+
         my $total = $hash->{'keyspace_hits'} + $hash->{'keyspace_misses'};
         printf("hitratio.value %.2f\n", $hash->{'keyspace_hits'} / $total * 100);
         printf("missratio.value %.2f\n", $hash->{'keyspace_misses'} / $total * 100);
@@ -172,7 +181,7 @@ switch ($0) {
 
         print "used_memory.value ". $hash->{'used_memory'}  ."\n";
     }
-    
+
     case "used_keys" {
         my $dbs;
         foreach my $key (keys %{$hash}) {
