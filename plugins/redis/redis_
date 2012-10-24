@@ -47,6 +47,7 @@ my $address = "$ip:$port";
 
 my $HOST = $ip;
 my $PORT = $port;
+my $title = "$ip:$port";
 
 my $PASSWORD = exists $ENV{'password'} ? $ENV{'password'} : undef;
 
@@ -94,7 +95,7 @@ close ($sock);
 switch ($cmd) {
     case "connected_clients" {
         if ( $config ) {
-            print "graph_title Connected clients\n";
+            print "graph_title Connected clients - $title\n";
             print "graph_vlabel Connected clients\n";
             print "graph_category redis\n";
             print "graph_args -l 0\n";
@@ -108,7 +109,7 @@ switch ($cmd) {
 
     case "keys_per_sec" {
         if ( $config ) {
-            print "graph_title Keys Per Second\n";
+            print "graph_title Keys Per Second - $title\n";
             print "graph_vlabel per \${graph_period}\n";
             print "graph_category redis\n";
             print "graph_args -l 0\n";
@@ -131,7 +132,7 @@ switch ($cmd) {
 
     case "key_ratio" {
         if ( $config ) {
-            print "graph_title Key Hit vs Miss Ratio\n";
+            print "graph_title Key Hit vs Miss Ratio - $title\n";
             print "graph_vlabel per \${graph_period}\n";
             print "graph_category redis\n";
             print "graph_args -u 100 -l 0 -r --base 1000\n";
@@ -152,7 +153,7 @@ switch ($cmd) {
 
     case "per_sec" {
         if ( $config ) {
-            print "graph_title Per second\n";
+            print "graph_title Per second - $title\n";
             print "graph_vlabel per \${graph_period}\n";
             print "graph_category redis\n";
             print "graph_args -l 0\n";
@@ -170,7 +171,7 @@ switch ($cmd) {
 
     case "used_memory" {
         if ( $config ) {
-            print "graph_title Used memory\n";
+            print "graph_title Used memory - $title\n";
             print "graph_vlabel Used memory\n";
             print "graph_category redis\n";
             print "graph_args -l 0\n";
@@ -191,7 +192,7 @@ switch ($cmd) {
         }
 
         if ( $config ) {
-            print "graph_title Used keys\n";
+            print "graph_title Used keys - $title\n";
             print "graph_vlabel Used keys\n";
             print "graph_category redis\n";
             print "graph_args -l 0\n";

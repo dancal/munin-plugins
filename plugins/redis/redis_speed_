@@ -32,6 +32,7 @@ my $HOST = $ip;
 my $PORT = $port;
 #my $HOST = exists $ENV{'host'} ? $ENV{'host'} : "127.0.0.1";
 #my $PORT = exists $ENV{'port'} ? $ENV{'port'} : 6379;
+my $title = "$ip:$port";
 
 my $server = "$HOST:$PORT";
 my $r = Redis->new( server => sprintf("%s:%d", $HOST, $PORT) );
@@ -51,7 +52,7 @@ sub get_time {
 
 
 if ( $config ) {
-    print "graph_title Response time\n";
+    print "graph_title Response time - $title\n";
     print "graph_vlabel Response time\n";
     print "ping.label PING time\n";
     print "get.label GET time\n";
