@@ -1,0 +1,60 @@
+#!/usr/bin/perl
+use warnings;
+use strict;
+
+# 2012-05-27 Dobrica Pavlinusic <dpavlin@rot13.org>
+
+use IO::Socket::INET;
+#use Data::Dump qw(dump);
+
+my $arg = shift @ARGV;
+$arg ||= '';
+
+my $sock = IO::Socket::INET->new(
+        PeerAddr => '127.0.0.1',
+        PeerPort => 4730,
+        Proto    => 'tcp'
+) || die $1;
+
+if ( $arg eq 'autoconf' ) {
+        print $sock ? "yes\n" : "no\n";
+        exit 0;
+}
+
+print $sock "STATUS\n";
+
+my $stats;
+
+while ( my $line = <$sock> ) {
+        chomp $line;
+#       warn "# [$line]\n";
+        last if $line eq '.';
+        next if $line =~ m/\t0$/; # ignore functions which don't have active workers
+        my ( $name, $queued, $running, $workers ) = split(/\t/,$line,4);
+        $stats->{queued}->{$name} = $queued;
+        $stats->{running}->{$name} = $running;
+        $stats->{workers}->{$name} = $workers;
+}
+
+if ( $arg eq 'config' ) {
+        foreach my $multigraph ( keys %$stats ) {
+                print "multigraph $multigraph\n";
+                print "graph_category gearman\n";
+                print "graph_title Gearman $multigraph\n";
+
+                foreach my $name ( keys %{ $stats->{$multigraph} } ) {
+                        my $label = $name;
+                        $name =~ s/\W+/_/g;
+                        print "$name.label $label\n";
+                }
+        }
+} else {
+        foreach my $multigraph ( keys %$stats ) {
+                print "multigraph $multigraph\n";
+                while ( my ($name,$value) = each %{ $stats->{$multigraph} } ) {
+                        $name =~ s/\W+/_/g;
+                        print "$name.value $value\n";
+                }
+        }
+}
+
